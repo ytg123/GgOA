@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.gg.ssm.mapper.UserMapper">
+	
+	<!-- sql片段 -->
+	<sql id="all_user_columns">
+		user_id,dept_id,login_name,password,
+		user_no,user_name,email,phone,
+		mobile,update_by,update_date,remarks
+	</sql>
+	
+	<sql id="query_user_sql_where">
+		<if test="userName!=null">
+			and user_name like '%${userName}%'
+		</if>
+		<if test="loginName!=null">
+			and login_name = #{loginName}
+		</if>
+		<if test="password!=null">
+			and password = #{password}
+		</if>
+	</sql>
+	<!-- 登录 -->
+	<select id="getUserList" parameterType="user" resultType="user">
+		select 
+			<include refid="all_user_columns"></include>
+		from pm_sys_user
+		<where>
+			<include refid="query_user_sql_where"></include>
+		</where>
+	</select>
+	<!-- 分页查询用户信息 -->
+	<select id="getUserDtoList" parameterType="user" resultType="userDto">
+		SELECT A.USER_ID,A.DEPT_ID,A.LOGIN_NAME,A.PASSWORD,
+   		 A.USER_NO,A.USER_NAME,A.EMAIL,A.PHONE,A.MOBILE,
+   		 A.UPDATE_BY,A.UPDATE_DATE,A.REMARKS,B.NAME DEPT_NAME 
+   		 FROM PM_SYS_USER A ,PM_SYS_DEPT B
+ 		<!--where 标签两个用途:1:添加sql中where关键字 2:判断第一个条件前面不需要AND-->
+		<where>
+			AND A.DEPT_ID = B.ID
+		 	<if test="userName!=null"> 
+				AND A.USER_NAME LIKE '%${userName}%'
+	 		</if>					
+			<if test="deptId!=null"> 
+				AND A.DEPT_ID= #{deptId}
+			</if>			
+		 </where>
+	</select>
+	<!-- 通过userId查询对象 -->
+	<select id="getUserById" parameterType="java.lang.Long" resultType="user">
+		select 
+			<include refid="all_user_columns"></include>
+		from pm_sys_user where user_id= #{userId}
+	</select>
+	<!-- 用户信息列表  包含部门名称和角色信息 -->
+	<select id="getUserInfoById" parameterType="java.lang.Long" resultType="userDto">
+		SELECT A.USER_ID,A.DEPT_ID,A.LOGIN_NAME,A.PASSWORD,
+   		 A.USER_NO,A.USER_NAME,A.EMAIL,A.PHONE,A.MOBILE,
+   		 A.UPDATE_BY,A.UPDATE_DATE,A.REMARKS,B.NAME DEPT_NAME 
+   		  FROM PM_SYS_USER A ,PM_SYS_DEPT B
+   		 WHERE A.USER_ID=#{usesId} AND A.DEPT_ID = B.ID	
+	</select>
+	<!-- 查询某个用户所拥有的角色信息 -->
+	<select id="getUserRoleByUserId" parameterType="java.lang.Long" resultType="userToRole">
+		SELECT USER_ID,ROLE_ID FROM PM_SYS_USER_ROLE WHERE USER_ID=#{userId}
+	</select>
+	<!-- 修改密码 -->
+	<update id="updatePsd">
+		UPDATE PM_SYS_USER SET PASSWORD = #{1} WHERE USER_ID = #{0}
+	</update>
+	<!-- 修改用户信息 -->
+	<update id="updateUserInfo" parameterType="user">
+		UPDATE PM_SYS_USER  
+		<set> 
+			<if test="deptId != null">
+	            DEPT_ID = #{deptId},
+	        </if>
+	        <if test="loginName != null">
+	            LOGIN_NAME = #{loginName},
+	        </if>   
+	        <if test="userNo != null">
+	            USER_NO = #{userNo},
+	        </if>
+	        <if test="userName != null">
+	            USER_NAME = #{userName},
+	        </if>	
+	        <if test="email != null">
+	            EMAIL = #{email},
+	        </if>
+	        <if test="phone != null">
+	            PHONE = #{phone},
+	        </if>
+	         <if test="mobile != null">
+	            MOBILE = #{mobile},
+	        </if>
+	        <if test="updateBy != null">
+	            UPDATE_BY = #{updateBy},
+	        </if>
+	        <if test="updateDate != null">
+	            UPDATE_DATE = #{updateDate},
+	        </if>
+	        <if test="remarks != null">
+	            REMARKS = #{remarks},
+	        </if>		 
+		</set>
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	<!-- 新增用户信息  包含角色对应表 -->
+	<insert id="addUser" parameterType="user">
+		<selectKey keyProperty="userId" resultType="long" order="AFTER" >
+               SELECT LAST_INSERT_ID() as userId
+        </selectKey>
+        	  
+		INSERT INTO PM_SYS_USER(DEPT_ID,LOGIN_NAME,PASSWORD,
+   						 USER_NO,USER_NAME,EMAIL,PHONE,MOBILE,
+   		 				UPDATE_BY,UPDATE_DATE,REMARKS)
+		VALUES(#{deptId},#{loginName},#{password},#{userNo},
+				#{userName},#{email},#{phone},#{mobile},
+				#{updateBy},#{updateDate},#{remarks})
+	</insert>
+	
+	<!-- 批量添加角色用户信息对应表 -->
+	<insert id="addUserRoleBatch" parameterType="userToRole">
+		INSERT INTO PM_SYS_USER_ROLE(USER_ID,ROLE_ID)
+		VALUES
+		<foreach collection="list" item="userToRole" index="index" separator="," >  
+        	(#{userToRole.userId},#{userToRole.roleId})  
+   		</foreach> 
+	</insert>
+	
+	<!-- 删除用户信息  和  用户角色对应表 -->
+	<delete id="deleteUserRoleByUserId" parameterType="java.lang.Long">
+		DELETE FROM PM_SYS_USER_ROLE WHERE USER_ID=#{id}
+	</delete>
+	<delete id="deleteUser" parameterType="java.lang.Long">
+		DELETE FROM PM_SYS_USER WHERE USER_ID=#{id}
+	</delete>
+</mapper>

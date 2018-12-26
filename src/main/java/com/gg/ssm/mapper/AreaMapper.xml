@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.gg.ssm.mapper.AreaMapper">
+	<!-- sql片段 -->
+	<sql id="all_area_column">
+		id,parent_id,name,sort,code,create_by,create_date,update_by,update_date,remarks
+	</sql>
+	<!-- 查询所有 -->
+	<select id="getAllAreaList" resultType="area">
+		select 
+		<include refid="all_area_column"></include>
+		from pm_sys_area
+	</select>
+	<!--  根据id查询区域明细 -->
+	<select id="getAreaListById" parameterType="java.lang.Long" resultType="area">
+	 	<!--此处稍微有点特殊,需要讲父节点名称查出来  -->
+		SELECT  C.ID,C.PARENT_ID,D.NAME AS PARENT_NAME,C.NAME,
+ 		C.SORT,C.CODE,C.UPDATE_BY,C.UPDATE_DATE,C.REMARKS
+		FROM PM_SYS_AREA C LEFT JOIN PM_SYS_AREA D 
+		ON C.PARENT_ID=D.ID WHERE C.ID = #{ID}	 
+ 	</select>
+ 	<!--获取某个节点的子节点数目  -->
+	<select id="getChildCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM PM_SYS_AREA WHERE PARENT_ID = #{parentId};	
+	</select>
+	<!--增加区域  -->
+	<insert id="addArea" parameterType="area">
+		<!--在类似于mysql的数据库,有自增长id的设置时,在插入成功后,返回主键,放入对象中  -->
+		<selectKey keyProperty="id" resultType="long" order="AFTER" >
+               SELECT LAST_INSERT_ID() as id
+        </selectKey>
+        	  
+		INSERT INTO PM_SYS_AREA(PARENT_ID,NAME,SORT,CODE,
+					UPDATE_BY, CREATE_BY,CREATE_DATE,UPDATE_DATE,REMARKS)
+		VALUES(#{parentId},#{name},#{sort},#{code},
+				#{updateBy},#{createBy},#{createDate},#{updateDate},#{remarks})	
+				
+	</insert>
+	
+	<!--删除区域记录  -->
+  	<delete id="AreaDelete" parameterType="java.lang.Long">
+  		DELETE FROM PM_SYS_AREA WHERE ID = #{id} 		
+  	</delete>
+  	<!-- 根据部门id删除区域与角色的对应关系 -->
+	<delete id="AreaToRoleDelete" parameterType="java.lang.Long">
+		delete from pm_sys_role_area where area_id = #{id}
+	</delete>
+  	<!--修改区域  -->
+  	<update id="updateArea" parameterType="area">
+  		UPDATE PM_SYS_AREA  
+		<set> 				
+			<if test="parentId != null">
+	            PARENT_ID = #{parentId},
+	        </if>
+	        <if test="name != null">
+	            NAME = #{name},
+	        </if>	   
+	        <if test="sort != null">
+	            SORT = #{sort},
+	        </if>
+	        <if test="code != null">
+	            Code = #{code},
+	        </if>	         
+	        <if test="updateBy != null">
+	            UPDATE_BY = #{updateBy},
+	        </if>
+	        <if test="updateDate != null">
+	            UPDATE_DATE = #{updateDate},
+	        </if>
+	        <if test="remarks != null">
+	            REMARKS = #{remarks},
+	        </if>		 
+		</set>
+		WHERE ID = #{id}
+  	</update>
+</mapper>

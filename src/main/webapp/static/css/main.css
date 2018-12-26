@@ -1,0 +1,7 @@
+.navbar-inverse{background-color: #3BBCF9;border-color: #3BBCF9;}
+.navbar-brand img{margin-top: -14px;}
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{background-color:#CBD5F7;color:#333;}
+.navbar-inverse .navbar-nav>li>a{color:#fff;}
+.welcom{line-height: 30px;margin: 10px;font-weight:500;font-size:14px;}
+.btn.btn-success{margin-top: 8px;}
+.orange{color:#f00;}

@@ -1,0 +1,49 @@
+spring  springmvc mybatis 项目实战  OA:
+	
+	* 新建mavenWeb工程 ,部署运行通过
+
+	* 通过maven项目加入我们需要用的项目构建/依赖 /jar包
+		* 基本的jar
+		* 运用的框架的jar包
+		
+	* 引入sssm需要的配置文件和一些基本的配置
+	 	applicationContext.xml
+		jdbc.properties
+		log4j.properties
+		mybatis-cfg.xml
+		springmvc.xml
+	
+	* web.xml里面的配置	
+		读取spring/springmvc的配置文件 springmvcServlet的入门
+		乱码过滤器 ,异常页面
+		
+	* 测试一下系统是否运行正常
+	
+OA项目简介:
+	office  automatic  system   管事  管钱  管人 管物
+	涵盖的模块和功能:
+		人事管理
+		后勤管理
+		考勤模块
+		薪酬体系
+		财务   在线交流(论坛)  
+		在线消息通知
+		在此基础上还可以扩充客户管理系统(CRM) 客户关系管理  销售管理 仓库   物料   库存
+		还可以进行扩充  进销存  成本管理   利润成本分析  资产分析   ERP  Enterprise resource  planning
+		
+		以上是一些基本功能和需求   细化成系统功能需求 分为:  系统管理  工作流程管理  
+		
+实战主要做:
+	系统管理模块:
+		*用户管理
+		*角色管理
+		*菜单管理
+		*部门管理
+		*字典管理(分页)
+		*登录(加密算法)
+	工作流模块(工作流引擎 activiti):
+		*工作流程发布
+		*工作流程的应用
+		*工作流程处理
+		*工作流的信息浏览
+		

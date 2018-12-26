@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"     
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd   
+        http://www.springframework.org/schema/mvc    
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd    
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+       <!-- 注解扫描 -->
+       <context:component-scan base-package="com.gg.ssm.*">
+       		<!-- 只能包含controller扫描 use-default-filters="false"-->
+       		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+       </context:component-scan>
+        <!-- 配置静态资源的访问 -->
+        <mvc:resources location="/static/" mapping="/static/**"></mvc:resources>
+        <!-- <mvc:default-servlet-handler/> -->
+        
+       <!-- 处理器映射器 注解需要的-->
+       <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean> -->
+       <!-- 处理器适配器 注解需要的-->
+       <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"></bean> -->
+       <!-- 开启mvc注解驱动 -->
+       <mvc:annotation-driven/>
+       <!-- 视图解析器 -->
+       <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+       	<!-- 配置ModelAndView返回页面的前缀和后缀名 -->
+       		<property name="prefix" value="/WEB-INF/pages/"></property>
+       		<property name="suffix" value=".jsp"></property>
+       </bean>
+       
+       <!-- 数据校验器 -->
+		<!-- <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+			<property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
+		</bean> -->
+       
+      
+       <!-- 拦截器的配置  /** 多级匹配-->
+       <mvc:interceptors>
+       		<mvc:interceptor>
+       			<mvc:mapping path="/**"/>
+       			<mvc:exclude-mapping path="/static/**"/>
+       			<bean class="com.gg.ssm.framework.interceptor.LoginInterceptor"></bean>
+       		</mvc:interceptor>
+       		<!-- 国际化的拦截器
+       		<mvc:interceptor>
+       			<mvc:mapping path="/**"/>
+       			<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"></bean>
+       		</mvc:interceptor> -->
+       </mvc:interceptors>
+       
+       <!-- 文件上传下载  解析器 -->
+       <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+       		<property name="defaultEncoding" value="UTF-8"></property>
+       		<!-- 上传文件的总大小 -->
+       		<property name="maxUploadSize" value="1024000"></property>
+       </bean>
+        
+        <!-- 加载国际化资源文件 -->
+        <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        	<property name="basename" value="i18n"></property>
+        	<property name="useCodeAsDefaultMessage" value="true"></property>
+        </bean>
+        
+        <!-- 配置session国际化解析器 -->
+        <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"></bean>
+
+		 <!-- 配置简单的异常处理类 -->
+		 <!-- <bean  class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		 	<property name="defaultErrorView" value="sysmanger/error/simpleexHandle.jsp"></property>
+		 	<property name="exceptionAttribute" value="ex"></property>
+		 	<property name="exceptionMappings">
+		 		<props>
+		 			<prop key="java.lang.NullPointerException">sysmanger/error/simpleexHandle.jsp</prop>
+		 		</props>
+		 	</property>
+		 </bean> -->
+</beans>

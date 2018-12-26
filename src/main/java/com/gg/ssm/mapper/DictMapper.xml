@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.gg.ssm.mapper.DictMapper">
+	
+	<!-- sql片段 -->
+	<sql id="all_dict_columns">
+		ID,VALUE,LABEL, TYPE ,DESCRIPTION ,SORT ,
+   		 PARENT_ID ,UPDATE_BY, UPDATE_DATE, REMARKS
+	</sql>
+	
+	<sql id="query_dict_sql_where">
+		<if test="type!=null"> 
+			AND TYPE= #{type}
+		</if>
+		<if test="description!=null"> 
+			AND DESCRIPTION LIKE '%${description}%'
+		</if>
+	</sql>
+	<!-- 字典类型查询 -->
+	<select id="getAllDictType" resultType="java.lang.String">
+		select DISTINCT TYPE from pm_sys_dict
+	</select>
+	<!-- 根据条件查询字典列表 -->
+	<select id="queryDictList" parameterType="dict" resultType="dict">
+		select 
+		<include refid="all_dict_columns"></include>
+		from pm_sys_dict
+		<where>
+			<include refid="query_dict_sql_where"></include>
+		</where>
+	</select>
+	
+	<!-- 增加字典信息 -->
+	<insert id="addDict" parameterType="dict">
+		
+		INSERT INTO PM_SYS_DICT(VALUE,LABEL, TYPE ,DESCRIPTION ,SORT ,
+   							 PARENT_ID ,UPDATE_BY, UPDATE_DATE, REMARKS)
+   		VALUES(#{value},#{label},#{type},#{description},#{sort},
+   				#{parentId},#{updateBy},#{updateDate},#{remarks}
+   		 )	
+	</insert>
+	<!-- 修改 -->
+	<update id="updateDict" parameterType="dict">
+		UPDATE PM_SYS_DICT  
+			<set> 
+				<if test="value != null">
+		            VALUE = #{value},
+		        </if>
+		        <if test="label != null">
+		            LABEL = #{label},
+		        </if>
+		   
+		        <if test="type != null">
+		            TYPE = #{type},
+		        </if>
+		        <if test="description != null">
+		            DESCRIPTION = #{description},
+		        </if>	
+		        <if test="sort != null">
+		            SORT = #{sort},
+		        </if>
+		        <if test="parentId != null">
+		            PARENT_ID = #{parentId},
+		        </if>
+		        <if test="updateBy != null">
+		            UPDATE_BY = #{updateBy},
+		        </if>
+		        <if test="updateDate != null">
+		            UPDATE_DATE = #{updateDate},
+		        </if>
+		        <if test="remarks != null">
+		            REMARKS = #{remarks},
+		        </if>		 
+			</set>
+			WHERE ID = #{id}
+	</update>
+	<!-- 删除字典 -->
+	<update id="deleteDict" parameterType="java.lang.Long">
+		delete from PM_SYS_DICT where id = #{id}
+	</update>
+</mapper>
